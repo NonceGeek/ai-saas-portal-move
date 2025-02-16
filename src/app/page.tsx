@@ -40,13 +40,20 @@ import { AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 // Imports for registering a browser extension wallet plugin on page load
 // import { MyWallet } from "@/utils/standardWallet";
 // import { registerWallet } from "@aptos-labs/wallet-standard";
 
 import { NavBar } from "@/components/NavBar";
 
-import { AptosWallet, ReadonlyUint8Array, UserResponseStatus } from "@aptos-labs/wallet-standard";
+import {
+  AptosWallet,
+  ReadonlyUint8Array,
+  UserResponseStatus,
+} from "@aptos-labs/wallet-standard";
 
 import { WalletButton } from "@/components/wallet/WalletButton";
 import { useAptosWallet } from "@razorlabs/wallet-kit";
@@ -94,7 +101,7 @@ async function doGetBalanceByResourceWay(aptos: Aptos, accountAddress: string) {
     resourceType: "0x1::coin::CoinStore<0x1::aptos_coin::AptosCoin>",
   });
   console.log("resp", resp.coin.value);
-  return resp
+  return resp;
 }
 
 async function doGetBalance(aptos: Aptos, accountAddress: string) {
@@ -124,8 +131,100 @@ async function doGetBalance(aptos: Aptos, accountAddress: string) {
 //   });
 // }
 
+// Add this helper function near the top of the file
+const shortenUuid = (uuid: string) => {
+  return `${uuid.slice(0, 2)}...${uuid.slice(-2)}`;
+};
+
 export default function Home() {
-  const { toast } = useToast();
+  // <!-- things about tasks
+  const [unsolvedTasks, setUnsolvedTasks] = useState([]);
+  const [agents, setAgents] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAssignTaskModalOpen, setIsAssignTaskModalOpen] = useState(false);
+  const [isAgentModalOpen, setIsAgentModalOpen] = useState(false);
+  const [taskForm, setTaskForm] = useState({
+    prompt: "",
+    task_type: "llm",
+    fee: "",
+    fee_unit: "MOVE",
+    agent_id: "",
+  });
+
+  const [taskRequestApi, setTaskRequestApi] = useState("");
+
+  const [taskId, setTaskId] = useState("");
+
+  // Add this useEffect after other useEffect declarations
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await fetch("https://ai-saas.deno.dev/agents");
+        const data = await response.json();
+        setAgents(data);
+      } catch (error) {
+        console.error("Error fetching agents:", error);
+        toast.error("Failed to fetch agents");
+      }
+    };
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch("https://ai-saas.deno.dev/task_unsolved");
+        const data = await response.json();
+        setUnsolvedTasks(data);
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+        // toast({
+        //   title: "Error",
+        //   description: "Failed to fetch tasks"
+        // });
+      }
+    };
+
+    fetchTasks();
+    fetchAgents();
+  }, []);
+
+  const handleSubmitTask = async (address: string) => {
+    try {
+      const response = await fetch("https://ai-saas.deno.dev/add_task", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user: address,
+          ...taskForm,
+        }),
+      });
+      console.log(
+        JSON.stringify({
+          user: address,
+          ...taskForm,
+        })
+      );
+      if (!response.ok) throw new Error("Failed to submit task" + response);
+
+      toast.success("Task submitted successfully!");
+      setIsModalOpen(false);
+      const tasksResponse = await fetch(
+        "https://ai-saas.deno.dev/task_unsolved"
+      );
+      const data = await tasksResponse.json();
+      setUnsolvedTasks(data);
+    } catch (error) {
+      console.error("Error submitting task:", error);
+      toast.error(
+        "Failed to submit task" +
+          JSON.stringify({
+            user: address,
+            ...taskForm,
+          })
+      );
+    }
+  };
+
+  // things about tasks -->
 
   // const {
   //   account,
@@ -137,7 +236,7 @@ export default function Home() {
   // } = useWallet();
   const { connected, disconnect, account, signAndSubmitTransaction, adapter } =
     useAptosWallet();
-  const [accountInfo, setAccountInfo] = useState<AccountInfo| null>(null);
+  const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
 
   // Move these inside useEffect to only run after connection
   // const [adapter, setAdapter] = useState<AptosWallet | null>(null);
@@ -183,20 +282,17 @@ export default function Home() {
     if (!adapter || !aptos) return;
     const account = await adapter.account();
     const balance = await doGetBalance(aptos, account.address.toString());
-    toast({
-      title: "balance",
-      description: balance!.toString(),
-    });
+    toast.success(`Balance: ${balance!.toString()}`);
   }, [aptos, account]);
 
   const getBalanceByResourceWay = useCallback(async () => {
     if (!adapter || !aptos) return;
     const account = await adapter.account();
-    const resp = await doGetBalanceByResourceWay(aptos, account.address.toString());
-    toast({
-      title: "balance by resource way",
-      description: resp!.coin.value.toString(),
-    });
+    const resp = await doGetBalanceByResourceWay(
+      aptos,
+      account.address.toString()
+    );
+    toast.success(`Balance by resource way: ${resp!.coin.value.toString()}`);
   }, [aptos, account]);
 
   // Example usage within your component:
@@ -241,63 +337,417 @@ export default function Home() {
     } catch (error) {
       console.error(error);
     }
-    toast({
-      title: userResponse.status,
-      description: "This transaction has been " + userResponse.status,
-    });
+    toast.success(`This transaction has been ${userResponse.status}`);
   }, [account]);
+
+  // Add this function near other async functions
+  const assignTaskToAgent = async (taskId: string, taskRequestApi: string) => {
+    try {
+      const response = await fetch(taskRequestApi + "?task_id=" + taskId);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log("hello world!");
+      toast.success("Task assigned successfully!");
+      setIsAssignTaskModalOpen(false);
+      setTaskId('');
+
+      // Refresh the tasks list
+      const tasksResponse = await fetch('https://ai-saas.deno.dev/task_unsolved');
+      const tasksData = await tasksResponse.json();
+      setUnsolvedTasks(tasksData);
+
+    } catch (error) {
+      console.error('Error assigning task:', error);
+      toast.error('Failed to assign task to agent: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  };
 
   return (
     <main className="flex flex-col w-full max-w-[1000px] p-6 pb-12 md:px-8 gap-6">
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <div className="flex justify-between items-center">
         <NavBar />
         <WalletButton />
         <ThemeToggle />
       </div>
+      <h3
+        className={`text-3xl font-semibold mb-4 ${["text-blue-500", "text-purple-500", "text-pink-500", "text-green-500", "text-yellow-500", "text-red-500", "text-indigo-500"][Math.floor(Math.random() * 7)]}`}
+      >
+        「Aha! Make AI Agents as the Labors for your business!」
+        「Give every AI Agent an on-chain identity!」
+      </h3>
+      {/* TODO: copy the things in basicContainer to here */}
+      <div className="w-full flex-shrink-0">
+        <center>
+          <h3 className="text-3xl font-semibold mb-4">Data Panel</h3>
+        </center>
+        <div className="w-full grid grid-cols-3 gap-4 mb-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Agent Alive</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">{agents.length.toString()}</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Total Tasks</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">
+                {(unsolvedTasks.length + 6).toString()}
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Unsolved Tasks</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">
+                {unsolvedTasks.length.toString()}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+        {/* TODO: copy the things in basicContainer about Unsolved Tasks Stack Here. */}
+      </div>
+      <center>
+        <h3 className="text-3xl font-semibold mb-4">Unsolved Tasks Stack</h3>
+      </center>
+
+      <div className="w-full">
+        <table className="w-full table-auto border-collapse">
+          <thead className="sticky top-0 bg-white">
+            <tr className="bg-gray-100">
+              <th className="border px-4 py-2 text-blue-600">ID</th>
+              <th className="border px-4 py-2 text-blue-600">Task Requester</th>
+              <th className="border px-4 py-2 text-blue-600">Task Type</th>
+              <th className="border px-4 py-2 text-blue-600">Prompt</th>
+              <th className="border px-4 py-2 text-blue-600">Fee</th>
+              <th className="border px-4 py-2 text-blue-600">Created At</th>
+              <th className="border px-4 py-2 text-blue-600">Unique ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            {unsolvedTasks.map((task: any) => (
+              <tr key={task.id}>
+                <td className="border px-4 py-2">{task.id}</td>
+                <td
+                  className={`border px-4 py-2 ${task.user === account?.address ? "bg-blue-100 font-semibold" : ""}`}
+                >
+                  {task.user.slice(0, 6)}...{task.user.slice(-4)}
+                  <button
+                    onClick={() => navigator.clipboard.writeText(task.user)}
+                    className="ml-2 text-blue-500 hover:underline"
+                  >
+                    Copy
+                    {task.user === account?.address && (
+                      <span className="ml-2 text-blue-600">(💡You)</span>
+                    )}
+                  </button>
+                </td>
+                <td className="border px-4 py-2">{task.task_type}</td>
+                <td className="border px-4 py-2">{task.prompt}</td>
+                <td className="border px-4 py-2">
+                  {task.fee} {task.fee_unit}
+                </td>
+                <td className="border px-4 py-2">
+                  {new Date(task.created_at).toLocaleDateString()}
+                </td>
+                <td className="border px-4 py-2">
+                  {shortenUuid(task.unique_id)}
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(task.unique_id)
+                    }
+                    className="ml-2 text-blue-500 hover:underline"
+                  >
+                    Copy
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="w-full flex justify-center">
+        {connected ? (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+          >
+            Submit New Task
+          </button>
+        ) : (
+          <button
+            disabled
+            className="bg-gray-400 text-white px-6 py-2 rounded cursor-not-allowed"
+          >
+            Connect Wallet to Submit Task
+          </button>
+        )}
+      </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-[500px]">
+            <h3 className="text-2xl font-semibold mb-4">Submit New Task</h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Task Type
+                </label>
+                <select
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-blue-500"
+                  value={taskForm.task_type}
+                  onChange={(e) =>
+                    setTaskForm({ ...taskForm, task_type: e.target.value })
+                  }
+                  disabled={!!taskForm.agent_id}
+                >
+                  <option value="llm">LLM</option>
+                  <option value="img">IMG</option>
+                  <option value="trade">TRADE</option>
+                </select>
+                {taskForm.agent_id && (
+                  <p className="mt-1 text-sm text-gray-500">
+                    Task type is locked to match agent capabilities
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Task Description
+                </label>
+                <textarea
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-blue-500"
+                  rows={4}
+                  value={taskForm.prompt}
+                  onChange={(e) =>
+                    setTaskForm({ ...taskForm, prompt: e.target.value })
+                  }
+                  placeholder={
+                    taskForm.agent_id
+                      ? "Describe your task for this specific agent..."
+                      : "Describe your task..."
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Fee (Optional)
+                </label>
+                <input
+                  type="number"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-blue-500"
+                  value={taskForm.fee}
+                  onChange={(e) =>
+                    setTaskForm({ ...taskForm, fee: e.target.value })
+                  }
+                />
+                <select
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-blue-500"
+                  value={taskForm.fee_unit}
+                  onChange={(e) =>
+                    setTaskForm({ ...taskForm, fee_unit: e.target.value })
+                  }
+                >
+                  <option value="MOVE">MOVE</option>
+                  <option value="USDC">USDC</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setTaskForm({
+                    prompt: "",
+                    task_type: "llm",
+                    fee: "",
+                    fee_unit: "MOVE",
+                    agent_id: "",
+                  });
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleSubmitTask(account?.address)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TODO: copy the AI Agents part in basicContainer to here */}
       {connected && (
         <>
-          <button
-            onClick={getBalanceByResourceWay}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-            // disabled={!connected || !adapter || !aptos}
-          >
-            Get Resource Example: Get Balance
-          </button>
-
-          <button
-            onClick={getBalance}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-            // disabled={!connected || !adapter || !aptos}
-          >
-            View Func Example: Get Balance
-          </button>
-          <button
-            onClick={handleTransaction}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-            // disabled={!connected || !adapter || !aptos}
-          >
-            Send Transaction Example: Transfer
-          </button>
-          <WalletConnection
-            // account={
-            //   {
-            //     address: account?.address || "",
-            //     publicKey: account?.publicKey || "",
-            //     minKeysRequired: undefined,
-            //     ansName: undefined,
-            //   } as AccountInfo
-            account={accountInfo}
-            network={networkInfo}
-            wallet={
-              {
-                name: adapter?.name || "",
-                icon: adapter?.icon || "",
-                url: "",
-              } as WalletInfo
-            }
-          />
+          <center><h3 className="text-3xl font-semibold mb-4">AI Agents</h3></center>
+          <div className="w-full">
+            <table className="w-full table-auto border-collapse">
+              <thead className="sticky top-0 bg-white">
+                <tr className="bg-gray-100">
+                  <th className="border px-4 py-2 text-blue-600">
+                    Description
+                  </th>
+                  <th className="border px-4 py-2 text-blue-600">Type</th>
+                  <th className="border px-4 py-2 text-blue-600">Address</th>
+                  <th className="border px-4 py-2 text-blue-600">Owner</th>
+                  <th className="border px-4 py-2 text-blue-600">Homepage</th>
+                  <th className="border px-4 py-2 text-blue-600">Give Task!</th>
+                  <th className="border px-4 py-2 text-blue-600">Unique ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {agents.map((agent: any) => (
+                  <tr key={agent.id}>
+                    <td className="border px-4 py-2">{agent.description}</td>
+                    <td className="border px-4 py-2">
+                      {agent.type.toUpperCase()}
+                    </td>
+                    <td className="border px-4 py-2">
+                      {agent.addr.slice(0, 6)}...{agent.addr.slice(-4)}
+                      <button
+                        onClick={() =>
+                          navigator.clipboard.writeText(agent.addr)
+                        }
+                        className="ml-2 text-blue-500 hover:underline"
+                      >
+                        Copy
+                      </button>
+                      <button
+                        onClick={() => window.open(`https://explorer.movementlabs.xyz/account/${agent.addr}/resources?network=bardock+testnet`, '_blank')}
+                        className="ml-2 text-blue-500 hover:underline"
+                      >
+                        View DID
+                      </button>
+                    </td>
+                    <td className="border px-4 py-2">
+                      {agent.owner_addr.slice(0, 6)}...
+                      {agent.owner_addr.slice(-4)}
+                      <button
+                        onClick={() =>
+                          navigator.clipboard.writeText(agent.owner_addr)
+                        }
+                        className="ml-2 text-blue-500 hover:underline"
+                      >
+                        Copy
+                      </button>
+                    </td>
+                    <td className="border px-4 py-2">
+                      <a
+                        href={agent.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        Chat with!
+                      </a>
+                    </td>
+                    <td className="border px-4 py-2">
+                      <button
+                        onClick={() => {
+                          setIsAssignTaskModalOpen(true);
+                          setTaskRequestApi(agent.task_request_api);
+                        }}
+                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                      >
+                        Assign Task
+                      </button>
+                    </td>
+                    <td className="border px-4 py-2">
+                      {shortenUuid(agent.unique_id)}
+                      <button
+                        onClick={() =>
+                          navigator.clipboard.writeText(agent.unique_id)
+                        }
+                        className="ml-2 text-blue-500 hover:underline"
+                      >
+                        Copy
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="w-full flex justify-center">
+            <button
+              onClick={() => setIsAgentModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+            >
+              New Agent Register Guide(TODO)
+            </button>
+          </div>
         </>
       )}
+
+      {isAssignTaskModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-[500px]">
+            <h3 className="text-2xl font-semibold mb-4">
+              Assign Task to This Agent
+            </h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Task Id
+              </label>
+              <textarea
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-blue-500"
+                rows={1}
+                value={taskId}
+                onChange={(e) =>
+                  setTaskId(e.target.value)
+                }
+              />
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={() => assignTaskToAgent(taskId, taskRequestApi)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                disabled={!taskId.trim()}
+              >
+                Request
+              </button>
+              <button
+                onClick={() => setIsAssignTaskModalOpen(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* <div className="flex justify-between gap-6 pb-10">
         
         <div className="flex flex-col gap-2 md:gap-3">
@@ -326,12 +776,15 @@ export default function Home() {
       )} */}
       {connected && (
         <>
-          <SingleSigner />
+          {/* <SingleSigner /> */}
           {/* <TransactionParameters />
           <Sponsor />
           <MultiAgent /> */}
         </>
       )}
+      <footer className="mt-auto text-center py-4 text-gray-600">
+        Powered by DIMSUM AI Lab@2025
+      </footer>
     </main>
   );
 }
@@ -351,44 +804,44 @@ function WalletConnection({ account, network, wallet }: WalletConnectionProps) {
   };
 
   const isNetworkChangeSupported = wallet?.name === "Nightly";
-  
+
   // Add function to handle address conversion
   const getAddressString = () => {
     if (!account?.address) return null;
-    
+
     try {
-      if (typeof account.address === 'object' && 'data' in account.address) {
+      if (typeof account.address === "object" && "data" in account.address) {
         const addressData = account.address.data;
         return Object.values(addressData)
-          .map(b => b.toString(16).padStart(2, '0'))
-          .join('');
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
       }
-      
-      if (typeof account.address === 'string') {
+
+      if (typeof account.address === "string") {
         return account.address;
       }
-      
+
       return null;
     } catch (error) {
-      console.error('Error processing address:', error);
+      console.error("Error processing address:", error);
       return null;
     }
   };
 
   const getPublicKeyString = () => {
     if (!account?.publicKey) return null;
-    
+
     try {
-      if (typeof account.publicKey === 'object' && 'key' in account.publicKey) {
+      if (typeof account.publicKey === "object" && "key" in account.publicKey) {
         const keyData = account.publicKey.key.data;
         return Object.values(keyData)
-          .map(b => b.toString(16).padStart(2, '0'))
-          .join('');
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
       }
-      
+
       return null;
     } catch (error) {
-      console.error('Error processing public key:', error);
+      console.error("Error processing public key:", error);
       return null;
     }
   };
@@ -437,94 +890,95 @@ function WalletConnection({ account, network, wallet }: WalletConnectionProps) {
   // console.log('Processed publicKey:', publicKey);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Wallet Connection</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-10 pt-6">
-        <div className="flex flex-col gap-6">
-          <h4 className="text-lg font-medium">Wallet Details</h4>
-          <LabelValueGrid
-            items={[
-              {
-                label: "Icon",
-                value: wallet?.icon ? (
-                  <Image
-                    src={wallet.icon}
-                    alt={wallet.name}
-                    width={24}
-                    height={24}
-                  />
-                ) : (
-                  "Not Present"
-                ),
-              },
-              {
-                label: "Name",
-                value: wallet?.name ?? "Not Present",
-              },
-              {
-                label: "URL",
-                value: wallet?.url ? (
-                  <a
-                    href={wallet.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-blue-600 dark:text-blue-300"
-                  >
-                    {wallet.url}
-                  </a>
-                ) : (
-                  "Not Present"
-                ),
-              },
-            ]}
-          />
-        </div>
+    <div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Wallet Connection</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-10 pt-6">
+          <div className="flex flex-col gap-6">
+            <h4 className="text-lg font-medium">Wallet Details</h4>
+            <LabelValueGrid
+              items={[
+                {
+                  label: "Icon",
+                  value: wallet?.icon ? (
+                    <Image
+                      src={wallet.icon}
+                      alt={wallet.name}
+                      width={24}
+                      height={24}
+                    />
+                  ) : (
+                    "Not Present"
+                  ),
+                },
+                {
+                  label: "Name",
+                  value: wallet?.name ?? "Not Present",
+                },
+                {
+                  label: "URL",
+                  value: wallet?.url ? (
+                    <a
+                      href={wallet.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600 dark:text-blue-300"
+                    >
+                      {wallet.url}
+                    </a>
+                  ) : (
+                    "Not Present"
+                  ),
+                },
+              ]}
+            />
+          </div>
 
-        <div className="flex flex-col gap-6">
-          <h4 className="text-lg font-medium">Account Info</h4>
-          <LabelValueGrid items={items} />
-        </div>
+          <div className="flex flex-col gap-6">
+            <h4 className="text-lg font-medium">Account Info</h4>
+            <LabelValueGrid items={items} />
+          </div>
 
-        <div className="flex flex-col gap-6">
-          <h4 className="text-lg font-medium">Network Info</h4>
-          <LabelValueGrid
-            items={[
-              {
-                label: "Network name",
-                value: (
-                  <DisplayValue
-                    value={network?.name ?? "Not Present"}
-                    isCorrect={isValidNetworkName()}
-                    expected={Object.values<string>(Network).join(", ")}
-                  />
-                ),
-              },
-              {
-                label: "URL",
-                value: network?.url ? (
-                  <a
-                    href={network.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-blue-600 dark:text-blue-300"
-                  >
-                    {network.url}
-                  </a>
-                ) : (
-                  "Not Present"
-                ),
-              },
-              {
-                label: "Chain ID",
-                value: network?.chainId ?? "Not Present",
-              },
-            ]}
-          />
-        </div>
+          <div className="flex flex-col gap-6">
+            <h4 className="text-lg font-medium">Network Info</h4>
+            <LabelValueGrid
+              items={[
+                {
+                  label: "Network name",
+                  value: (
+                    <DisplayValue
+                      value={network?.name ?? "Not Present"}
+                      isCorrect={isValidNetworkName()}
+                      expected={Object.values<string>(Network).join(", ")}
+                    />
+                  ),
+                },
+                {
+                  label: "URL",
+                  value: network?.url ? (
+                    <a
+                      href={network.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600 dark:text-blue-300"
+                    >
+                      {network.url}
+                    </a>
+                  ) : (
+                    "Not Present"
+                  ),
+                },
+                {
+                  label: "Chain ID",
+                  value: network?.chainId ?? "Not Present",
+                },
+              ]}
+            />
+          </div>
 
-        {/* <div className="flex flex-col gap-6">
+          {/* <div className="flex flex-col gap-6">
           <h4 className="text-lg font-medium">Change Network</h4>
           <RadioGroup
             value={network?.name}
@@ -553,7 +1007,8 @@ function WalletConnection({ account, network, wallet }: WalletConnectionProps) {
             </div>
           )}
         </div> */}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

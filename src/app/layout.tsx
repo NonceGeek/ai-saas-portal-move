@@ -16,9 +16,9 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: "Scaffold-Move",
+  title: "TaiShang AI SaaS System",
   description:
-    "🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Move Chains.",
+    "Make AI Agents as the Labors for your business!",
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {

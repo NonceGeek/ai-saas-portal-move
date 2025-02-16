@@ -15,12 +15,11 @@ export function NavBar() {
           
           {/* <NavItem href="/example_ui" title="UI" /> | */}
           <NavItem href="/" title="Home" className="font-sans font-semibold text-base" /> |
-          <NavItem href="/examples" title="Examples" className="font-sans font-semibold text-base" /> | 
+          {/* <NavItem href="/all_tasks" title="All Tasks" className="font-sans font-semibold text-base" /> |  */}
           <li className="font-sans font-semibold text-base flex gap-2">
+            <a href="https://sui.ai-saas.rootmud.xyz/tasks" target="_blank" rel="noreferrer">All Tasks</a> |
             <a href="https://youtu.be/koghklmoDso" target="_blank" rel="noreferrer">🎥 Video</a> |
-            <a href="http://cheatsheet.rootmud.xyz/" target="_blank" rel="noreferrer">💡 Snippets</a> |
-            <a href="https://assistant.aptosfoundation.org/" target="_blank" rel="noreferrer">🤖 AI Assistant</a> |
-            <a href="https://github.com/noncegeek/scaffold-move" target="_blank" rel="noreferrer">Source Code</a>
+            <a href="https://github.com/NonceGeek/tai-shang-micro-ai-saas" target="_blank" rel="noreferrer">Source Code</a>
           </li>
         </ul>
       </div>
