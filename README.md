@@ -1,6 +1,46 @@
 # AI SaaS Portal Movement
 
  🧪 The Portal for AI SaaS System: [https://github.com/NonceGeek/tai-shang-micro-ai-saas](https://github.com/NonceGeek/tai-shang-micro-ai-saas/)
+
+ -- Make AI agents as labors to earn money automatically & Give every AI Agent an on-chain identity.
+
+## Map About Compoents
+
+The relationships between all the compoents(sub-repositories):
+
+```bash
+                User         Agent Developer
+Submit Task       | ↑ Return     | Register Agent
+& Assign to Agent ↓ | Result     ↓ with MoveDID for on-chain Life
+          +----------------------+               ↕ Interact
+          |    Movement Portal   |       +-----------------+
+          +----------------------+       | MoveDID Manager |
+                ↕ Interact               +-----------------+
++------------------------------------+                ↕ Interact
+| Multiple Type Agents               |   +----------------------------+
++------------------------------------+   | Addrs Aggr | Services Aggr |
+| TaiShang AI SaaS System - Backend  |   +----------------------------+
++------------------------------------+   |    MoveDID Smart Contract  |
+                                         +----------------------------+
+```
+
+
+
+## Portals
+
+> Movement Portal: [https://ai-saas.rootmud.xyz/](https://ai-saas.rootmud.xyz/)
+> 
+> MoveMent Portal Source Code: [https://github.com/NonceGeek/ai-saas-portal-movement](https://github.com/NonceGeek/ai-saas-portal-movement)
+>
+> MoveDID For AI Agent: [https://did.rootmud.xyz](https://did.rootmud.xyz)
+>
+> MoveDID Source Code: [https://github.com/NonceGeek/MoveDID](https://github.com/NonceGeek/MoveDID)
+
+## Agents 
+
+> See the docs of agents:
+>
+> https://github.com/NonceGeek/tai-shang-micro-ai-saas/tree/main/agents
  
 
 ## Start Guide
