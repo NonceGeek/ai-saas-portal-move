@@ -596,7 +596,13 @@ export default function Home() {
                 Cancel
               </button>
               <button
-                onClick={() => handleSubmitTask(account?.address)}
+                onClick={() => {
+                  if (account?.address) {
+                    handleSubmitTask(account.address);
+                  } else {
+                    toast.error("Please connect your wallet first");
+                  }
+                }}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
                 Submit
@@ -607,107 +613,101 @@ export default function Home() {
       )}
 
       {/* TODO: copy the AI Agents part in basicContainer to here */}
-      {connected && (
-        <>
-          <center><h3 className="text-3xl font-semibold mb-4">AI Agents</h3></center>
-          <div className="w-full">
-            <table className="w-full table-auto border-collapse">
-              <thead className="sticky top-0 bg-white">
-                <tr className="bg-gray-100">
-                  <th className="border px-4 py-2 text-blue-600">
-                    Description
-                  </th>
-                  <th className="border px-4 py-2 text-blue-600">Type</th>
-                  <th className="border px-4 py-2 text-blue-600">Address</th>
-                  <th className="border px-4 py-2 text-blue-600">Owner</th>
-                  <th className="border px-4 py-2 text-blue-600">Homepage</th>
-                  <th className="border px-4 py-2 text-blue-600">Give Task!</th>
-                  <th className="border px-4 py-2 text-blue-600">Unique ID</th>
-                </tr>
-              </thead>
-              <tbody>
-                {agents.map((agent: any) => (
-                  <tr key={agent.id}>
-                    <td className="border px-4 py-2">{agent.description}</td>
-                    <td className="border px-4 py-2">
-                      {agent.type.toUpperCase()}
-                    </td>
-                    <td className="border px-4 py-2">
-                      {agent.addr.slice(0, 6)}...{agent.addr.slice(-4)}
-                      <button
-                        onClick={() =>
-                          navigator.clipboard.writeText(agent.addr)
-                        }
-                        className="ml-2 text-blue-500 hover:underline"
-                      >
-                        Copy
-                      </button>
-                      <button
-                        onClick={() => window.open(`https://explorer.movementlabs.xyz/account/${agent.addr}/resources?network=bardock+testnet`, '_blank')}
-                        className="ml-2 text-blue-500 hover:underline"
-                      >
-                        View DID
-                      </button>
-                    </td>
-                    <td className="border px-4 py-2">
-                      {agent.owner_addr.slice(0, 6)}...
-                      {agent.owner_addr.slice(-4)}
-                      <button
-                        onClick={() =>
-                          navigator.clipboard.writeText(agent.owner_addr)
-                        }
-                        className="ml-2 text-blue-500 hover:underline"
-                      >
-                        Copy
-                      </button>
-                    </td>
-                    <td className="border px-4 py-2">
-                      <a
-                        href={agent.source_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
-                      >
-                        Chat with!
-                      </a>
-                    </td>
-                    <td className="border px-4 py-2">
-                      <button
-                        onClick={() => {
-                          setIsAssignTaskModalOpen(true);
-                          setTaskRequestApi(agent.task_request_api);
-                        }}
-                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                      >
-                        Assign Task
-                      </button>
-                    </td>
-                    <td className="border px-4 py-2">
-                      {shortenUuid(agent.unique_id)}
-                      <button
-                        onClick={() =>
-                          navigator.clipboard.writeText(agent.unique_id)
-                        }
-                        className="ml-2 text-blue-500 hover:underline"
-                      >
-                        Copy
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="w-full flex justify-center">
-            <button
-              onClick={() => setIsAgentModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
-            >
-              New Agent Register Guide(TODO)
-            </button>
-          </div>
-        </>
-      )}
+      <center><h3 className="text-3xl font-semibold mb-4">AI Agents</h3></center>
+      <div className="w-full">
+        <table className="w-full table-auto border-collapse">
+          <thead className="sticky top-0 bg-white">
+            <tr className="bg-gray-100">
+              <th className="border px-4 py-2 text-blue-600">Description</th>
+              <th className="border px-4 py-2 text-blue-600">Type</th>
+              <th className="border px-4 py-2 text-blue-600">Address</th>
+              <th className="border px-4 py-2 text-blue-600">Owner</th>
+              <th className="border px-4 py-2 text-blue-600">Homepage</th>
+              <th className="border px-4 py-2 text-blue-600">Give Task!</th>
+              <th className="border px-4 py-2 text-blue-600">Unique ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            {agents.map((agent: any) => (
+              <tr key={agent.id}>
+                <td className="border px-4 py-2">{agent.description}</td>
+                <td className="border px-4 py-2">
+                  {agent.type.toUpperCase()}
+                </td>
+                <td className="border px-4 py-2">
+                  {agent.addr.slice(0, 6)}...{agent.addr.slice(-4)}
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(agent.addr)
+                    }
+                    className="ml-2 text-blue-500 hover:underline"
+                  >
+                    Copy
+                  </button>
+                  <button
+                    onClick={() => window.open(`https://did.rootmud.xyz?addr=${agent.addr}`, '_blank')}
+                    className="ml-2 text-blue-500 hover:underline"
+                  >
+                    View DID
+                  </button>
+                </td>
+                <td className="border px-4 py-2">
+                  {agent.owner_addr.slice(0, 6)}...
+                  {agent.owner_addr.slice(-4)}
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(agent.owner_addr)
+                    }
+                    className="ml-2 text-blue-500 hover:underline"
+                  >
+                    Copy
+                  </button>
+                </td>
+                <td className="border px-4 py-2">
+                  <a
+                    href={agent.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    Chat with!
+                  </a>
+                </td>
+                <td className="border px-4 py-2">
+                  <button
+                    onClick={() => {
+                      setIsAssignTaskModalOpen(true);
+                      setTaskRequestApi(agent.task_request_api);
+                    }}
+                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+                  >
+                    Assign Task
+                  </button>
+                </td>
+                <td className="border px-4 py-2">
+                  {shortenUuid(agent.unique_id)}
+                  <button
+                    onClick={() =>
+                      navigator.clipboard.writeText(agent.unique_id)
+                    }
+                    className="ml-2 text-blue-500 hover:underline"
+                  >
+                    Copy
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="w-full flex justify-center">
+        <button
+          onClick={() => setIsAgentModalOpen(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded"
+        >
+          New Agent Register Guide
+        </button>
+      </div>
 
       {isAssignTaskModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -742,6 +742,57 @@ export default function Home() {
                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isAgentModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-[500px]">
+            <h3 className="text-2xl font-semibold mb-4">
+              How to Register Your AI Agent
+            </h3>
+            
+            <div className="space-y-4">
+              <div className="p-4 bg-gray-50 rounded-md">
+                <p className="font-medium mb-2">Step 1:</p>
+                <p className="flex items-center">
+                  Git Clone The Template From:
+                  <a 
+                    href="https://github.com/NonceGeek/tai-shang-micro-ai-saas/tree/main/agents" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-2 text-blue-600 hover:underline"
+                  >
+                    Templates
+                  </a>
+                </p>
+              </div>
+
+              <div className="p-4 bg-gray-50 rounded-md">
+                <p className="font-medium mb-2">Step 2:</p>
+                <p>Deploy AI Agent on Deno</p>
+              </div>
+
+              <div className="p-4 bg-gray-50 rounded-md">
+                <p className="font-medium mb-2">Step3:</p>
+                <p>Run Register with Agent: https://YOUR_AGENT_URL/register</p>
+              </div>
+
+              <div className="p-4 bg-gray-50 rounded-md">
+                <p className="font-medium mb-2">Step4:</p>
+                <p>Give Agent a MoveDID: <a href="https://did.rootmud.xyz" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">DID Manager</a></p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setIsAgentModalOpen(false)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Close
               </button>
             </div>
           </div>
