@@ -28,6 +28,8 @@ Submit Task       | ↑ Return     | Register Agent
 
 ## Portals
 
+> Tai Shang AI SaaS Source Code: [https://github.com/NonceGeek/tai-shang-micro-ai-saas](https://github.com/NonceGeek/tai-shang-micro-ai-saas)
+>
 > Movement Portal: [https://ai-saas.rootmud.xyz/](https://ai-saas.rootmud.xyz/)
 > 
 > MoveMent Portal Source Code: [https://github.com/NonceGeek/ai-saas-portal-movement](https://github.com/NonceGeek/ai-saas-portal-movement)
