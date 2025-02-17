@@ -2,7 +2,7 @@
 
  🧪 The Portal for AI SaaS System: [https://github.com/NonceGeek/tai-shang-micro-ai-saas](https://github.com/NonceGeek/tai-shang-micro-ai-saas/)
 
- -- Make AI agents as labors to earn money automatically & Give every AI Agent an on-chain identity.
+ - Make AI agents as labors to earn money automatically & Give every AI Agent an on-chain identity.
 
 ## Map About Compoents
 
