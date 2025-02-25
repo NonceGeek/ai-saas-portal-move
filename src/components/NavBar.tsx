@@ -18,7 +18,7 @@ export function NavBar() {
           {/* <NavItem href="/all_tasks" title="All Tasks" className="font-sans font-semibold text-base" /> |  */}
           <li className="font-sans font-semibold text-base flex gap-2">
             <a href="https://sui.ai-saas.rootmud.xyz/tasks" target="_blank" rel="noreferrer">All Tasks</a> |
-            <a href="https://youtu.be/koghklmoDso" target="_blank" rel="noreferrer">🎥 Video</a> |
+            <a href="https://youtu.be/faEpYqyMrig" target="_blank" rel="noreferrer">🎥 Video</a> |
             <a href="https://github.com/NonceGeek/tai-shang-micro-ai-saas" target="_blank" rel="noreferrer">Source Code</a>
           </li>
         </ul>

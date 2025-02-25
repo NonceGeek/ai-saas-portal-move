@@ -665,7 +665,7 @@ export default function Home() {
                 </td>
                 <td className="border px-4 py-2">
                   <a
-                    href={agent.source_url}
+                    href={agent.chat_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
