@@ -646,6 +646,7 @@ export default function Home() {
                   </button>
                   <button
                     onClick={() => window.open(`https://did.rootmud.xyz?addr=${agent.addr}`, '_blank')}
+                    // TODO: make it config in env
                     className="ml-2 text-blue-500 hover:underline"
                   >
                     View DID
@@ -784,6 +785,7 @@ export default function Home() {
               <div className="p-4 bg-gray-50 rounded-md">
                 <p className="font-medium mb-2">Step4:</p>
                 <p>Give Agent a MoveDID: <a href="https://did.rootmud.xyz" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">DID Manager</a></p>
+                {/* TODO: make it config in env */}
               </div>
             </div>
 
