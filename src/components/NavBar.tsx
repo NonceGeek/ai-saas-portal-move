@@ -21,27 +21,23 @@ export function NavBar() {
           {
             width > 768 && (
               <li className="sm:block font-sans font-semibold text-base flex gap-2">
-              <a href="https://sui.ai-saas.rootmud.xyz/tasks" target="_blank" rel="noreferrer">All Tasks</a> |
-              <a href="https://youtu.be/faEpYqyMrig" target="_blank" rel="noreferrer">🎥 Video</a> |
-              <a href="https://github.com/NonceGeek/tai-shang-micro-ai-saas" target="_blank" rel="noreferrer">Source Code</a>
-            </li>
+                <a href="https://general.ai-saas.rootmud.xyz/tasks" target="_blank" rel="noreferrer">All Tasks</a> |
+                <a href="https://youtu.be/faEpYqyMrig" target="_blank" rel="noreferrer">🎥 Video</a> |
+                <a href="https://pitch.com/v/team08_deck_taishang-ai-q83rfw" target="_blank" rel="noreferrer">📑 Deck</a> |
+                <a href="https://github.com/NonceGeek/tai-shang-micro-ai-saas" target="_blank" rel="noreferrer">Source Code</a>
+              </li>
             )
           }
           {
             width < 768 && (
               <li className="sm:block font-sans font-semibold text-base flex gap-2">
-              <a href="https://sui.ai-saas.rootmud.xyz/tasks" target="_blank" rel="noreferrer"><TaskAltIcon/></a>
-              <a href="https://youtu.be/faEpYqyMrig" target="_blank" rel="noreferrer"><PlayCircleIcon/></a>
-              <a href="https://github.com/NonceGeek/tai-shang-micro-ai-saas" target="_blank" rel="noreferrer"><CodeIcon/></a>
-            </li>
+                <a href="https://general.ai-saas.rootmud.xyz/tasks" target="_blank" rel="noreferrer"><TaskAltIcon/></a>
+                <a href="https://youtu.be/faEpYqyMrig" target="_blank" rel="noreferrer"><PlayCircleIcon/></a>
+                <a href="https://pitch.com/v/team08_deck_taishang-ai-q83rfw" target="_blank" rel="noreferrer">📑</a>
+                <a href="https://github.com/NonceGeek/tai-shang-micro-ai-saas" target="_blank" rel="noreferrer"><CodeIcon/></a>
+              </li>
             )
           }
-           {/* <li className="sm:block font-sans font-semibold text-base flex gap-2">
-              <a href="https://sui.ai-saas.rootmud.xyz/tasks" target="_blank" rel="noreferrer"><TaskAltIcon/></a>
-              <a href="https://youtu.be/faEpYqyMrig" target="_blank" rel="noreferrer"><PlayCircleIcon/></a>
-              <a href="https://github.com/NonceGeek/tai-shang-micro-ai-saas" target="_blank" rel="noreferrer"><CodeIcon/></a>
-            </li> */}
-        
         </ul>
       </div>
     </nav>

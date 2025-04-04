@@ -15,7 +15,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { assign } from "@razorlabs/m1-wallet-sdk";
+import { DID_ROOTMUD_URL } from "../lib/utils/constants";
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -68,7 +68,6 @@ function CompletedCard(card: CompletedCardProps) {
   return (
     <Card
       sx={{
-        // maxWidth: 350,
         maxWidth: {
           xs: 350,
           md: 400,
@@ -250,6 +249,29 @@ function AIAgentCard(agent: AgentCardProps) {
           sx={{ fontSize: 12, mt: 1, color: "text.secondary" }}
         >
           Address: {agent?.addr?.slice(0, 6)}...{agent?.addr?.slice(-4)}
+          <p>
+            <Link
+              component="button"
+              variant="body2"
+              onClick={() => navigator.clipboard.writeText(agent?.addr)}
+            >
+              Copy
+            </Link>
+            <Link
+              style={{ marginLeft: 8 }}
+              variant="body2"
+              component="button"
+              onClick={() =>
+                window.open(
+                  // `${DID_ROOTMUD_URL || 'https://did.rootmud.xyz'}?addr=${agent.addr}`,
+                  `${DID_ROOTMUD_URL}?addr=${agent.addr}`,
+                  "_blank"
+                )
+              }
+            >
+              View DID
+            </Link>
+          </p>
         </Typography>
         <Typography
           variant="body2"

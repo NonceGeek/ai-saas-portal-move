@@ -9,7 +9,6 @@ import { SingleSigner } from "@/components/transactionFlows/SingleSigner";
 import { useToast } from "@/components/ui/use-toast";
 // import { Sponsor } from "@/components/transactionFlows/Sponsor";
 // import { TransactionParameters } from "@/components/transactionFlows/TransactionParameters";
-// import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Card,
   CardContent,
@@ -43,6 +42,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { PendingCard, AIAgentCard } from "../uiWrapper/Card";
+import { DID_ROOTMUD_URL } from "../lib/utils/constants";
 
 // Imports for registering a browser extension wallet plugin on page load
 // import { MyWallet } from "@/utils/standardWallet";
@@ -387,11 +387,7 @@ export default function Home() {
         theme="light"
       />
       <div className="flex justify-between items-center border-b-1 border-yellow-200">
-        <a
-          href="http://home.scaffold.rootmud.xyz"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <a href="http://ai-saas.rootmud.xyz" target="_blank" rel="noreferrer">
           <Image
             src="/logo.png"
             width={64}
@@ -407,16 +403,6 @@ export default function Home() {
         </div>
       </div>
       <p className="text-3xl lg:text-6xl mt-12 mb-6 h-36 lg:h-48 rounded-lg text-center">
-        {/* <Typewriter
-          options={{
-            strings: [
-              "「Aha! Make AI Agents as the Labors for your business!」",
-              "「Give every AI Agent an on-chain identity!」",
-            ],
-            autoStart: true,
-            loop: true,
-          }}
-        /> */}
         <p className="text-3xl lg:text-6xl font-bold">
           Leverage AI agents as your business workfoce
         </p>
@@ -491,7 +477,6 @@ export default function Home() {
             ))}
           </div>
         </div>
-       
       </div>
 
       <div className="w-full flex justify-center">
@@ -638,7 +623,7 @@ export default function Home() {
               chat_url={agent.chat_url}
               assignTaskDom={
                 <Button
-                  style={{marginTop: "10px"}}
+                  style={{ marginTop: "10px" }}
                   size="small"
                   variant="outlined"
                   onClick={() => {
@@ -653,7 +638,7 @@ export default function Home() {
           </div>
         ))}
       </div>
-     
+
       <div className="w-full flex justify-center">
         <button
           onClick={() => setIsAgentModalOpen(true)}
@@ -738,7 +723,7 @@ export default function Home() {
                 <p>
                   Give Agent a MoveDID:{" "}
                   <a
-                    href="https://did.rootmud.xyz"
+                    href={DID_ROOTMUD_URL || "https://did.rootmud.xyz"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"
