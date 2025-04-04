@@ -1,6 +1,5 @@
 // import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
 import "./globals.css";
-
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { WalletProvider } from "@/components/WalletProvider";
 import { Toaster } from "@/components/ui/toaster";
@@ -14,11 +13,9 @@ const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
-
 export const metadata: Metadata = {
   title: "TaiShang AI SaaS System",
-  description:
-    "Make AI Agents as the Labors for your business!",
+  description: "Make AI Agents as the Labors for your business!",
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
@@ -26,7 +23,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "flex justify-center min-h-screen bg-background font-sans antialiased",
+          "flex justify-center min-h-screen bg-background font-sans antialiased bg-white dark:bg-gray-800",
           fontSans.variable
         )}
       >

@@ -18,9 +18,13 @@
     "@aptos-labs/wallet-adapter-react": "^3.7.9",
     "@aptos-labs/wallet-standard": "^0.1.0",
     "@bitget-wallet/aptos-wallet-adapter": "^0.1.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@martianwallet/aptos-wallet-adapter": "^0.0.5",
     "@mizuwallet-sdk/core": "^1.4.0",
     "@msafe/aptos-wallet-adapter": "^1.0.11",
+    "@mui/icons-material": "^7.0.1",
+    "@mui/material": "^7.0.1",
     "@okwallet/aptos-wallet-adapter": "^0.0.3",
     "@pontem/wallet-adapter-plugin": "^0.2.1",
     "@radix-ui/react-collapsible": "^1.0.3",
@@ -52,6 +56,8 @@
     "react-toastify": "^11.0.3",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
+    "typewriter-effect": "^2.21.0",
+    "usehooks-ts": "^3.1.1",
     "vercel": "^39.2.2"
   },
   "devDependencies": {

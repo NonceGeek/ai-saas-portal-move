@@ -40,8 +40,9 @@ import { AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { PendingCard, AIAgentCard } from "../uiWrapper/Card";
 
 // Imports for registering a browser extension wallet plugin on page load
 // import { MyWallet } from "@/utils/standardWallet";
@@ -58,6 +59,7 @@ import {
 import { WalletButton } from "@/components/wallet/WalletButton";
 import { useAptosWallet } from "@razorlabs/wallet-kit";
 import { isValidElement } from "react";
+import Button from "@mui/material/Button";
 
 // Add this interface declaration at the top of the file, after the imports
 declare global {
@@ -344,30 +346,34 @@ export default function Home() {
   const assignTaskToAgent = async (taskId: string, taskRequestApi: string) => {
     try {
       const response = await fetch(taskRequestApi + "?task_id=" + taskId);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log("hello world!");
       toast.success("Task assigned successfully!");
       setIsAssignTaskModalOpen(false);
-      setTaskId('');
+      setTaskId("");
 
       // Refresh the tasks list
-      const tasksResponse = await fetch('https://ai-saas.deno.dev/task_unsolved');
+      const tasksResponse = await fetch(
+        "https://ai-saas.deno.dev/task_unsolved"
+      );
       const tasksData = await tasksResponse.json();
       setUnsolvedTasks(tasksData);
-
     } catch (error) {
-      console.error('Error assigning task:', error);
-      toast.error('Failed to assign task to agent: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      console.error("Error assigning task:", error);
+      toast.error(
+        "Failed to assign task to agent: " +
+          (error instanceof Error ? error.message : "Unknown error")
+      );
     }
   };
 
   return (
-    <main className="flex flex-col w-full max-w-[1000px] p-6 pb-12 md:px-8 gap-6">
+    <main className="flex flex-col w-full max-w-[1000px] p-[12px] md:px-8 ">
       <ToastContainer
         position="top-center"
         autoClose={3000}
@@ -380,34 +386,61 @@ export default function Home() {
         pauseOnHover
         theme="light"
       />
-      <div className="flex justify-between items-center">
-        <NavBar />
-        <WalletButton />
-        <ThemeToggle />
+      <div className="flex justify-between items-center border-b-1 border-yellow-200">
+        <a
+          href="http://home.scaffold.rootmud.xyz"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <Image
+            src="/logo.png"
+            width={64}
+            height={64}
+            style={{ padding: "12px" }}
+            alt="logo"
+          />
+        </a>
+        <div className="flex gap-4 items-center">
+          <NavBar />
+          <WalletButton />
+          <ThemeToggle />
+        </div>
       </div>
-      <h3
-        className={`text-3xl font-semibold mb-4 ${["text-blue-500", "text-purple-500", "text-pink-500", "text-green-500", "text-yellow-500", "text-red-500", "text-indigo-500"][Math.floor(Math.random() * 7)]}`}
-      >
-        「Aha! Make AI Agents as the Labors for your business!」
-        「Give every AI Agent an on-chain identity!」
-      </h3>
+      <p className="text-3xl lg:text-6xl mt-12 mb-6 h-36 lg:h-48 rounded-lg text-center">
+        {/* <Typewriter
+          options={{
+            strings: [
+              "「Aha! Make AI Agents as the Labors for your business!」",
+              "「Give every AI Agent an on-chain identity!」",
+            ],
+            autoStart: true,
+            loop: true,
+          }}
+        /> */}
+        <p className="text-3xl lg:text-6xl font-bold">
+          Leverage AI agents as your business workfoce
+        </p>
+        <p className="text-2xl lg:text-4xl pt-[20px] pl-[20px] pr-[20px] text-gray-400">
+          Assign each an on-chain identity {`</>`}
+        </p>
+      </p>
       {/* TODO: copy the things in basicContainer to here */}
       <div className="w-full flex-shrink-0">
         <center>
-          <h3 className="text-3xl font-semibold mb-4">Data Panel</h3>
+          <h3 className="text-3xl font-semibold mb-4 mt-6">Data Panel</h3>
         </center>
-        <div className="w-full grid grid-cols-3 gap-4 mb-4">
-          <Card>
+        <div className="w-full grid grid-cols-3 gap-4 mb-4 text-center">
+          <Card className="bg-yellow-50 dark:bg-yellow-600">
             <CardHeader>
-              <CardTitle>Agent Alive</CardTitle>
+              <CardTitle className="text-sm lg:text-lg">Agent Alive</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{agents.length.toString()}</p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-yellow-50 dark:bg-yellow-600">
             <CardHeader>
-              <CardTitle>Total Tasks</CardTitle>
+              <CardTitle className="text-sm lg:text-lg">Total Tasks</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">
@@ -415,9 +448,11 @@ export default function Home() {
               </p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-yellow-50 dark:bg-yellow-600">
             <CardHeader>
-              <CardTitle>Unsolved Tasks</CardTitle>
+              <CardTitle className="text-sm lg:text-lg">
+                Unsolved Tasks
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">
@@ -428,64 +463,35 @@ export default function Home() {
         </div>
         {/* TODO: copy the things in basicContainer about Unsolved Tasks Stack Here. */}
       </div>
-      <center>
-        <h3 className="text-3xl font-semibold mb-4">Unsolved Tasks Stack</h3>
-      </center>
+      <div className="w-full mt-16">
+        <div className="w-full flex-shrink-0">
+          <center>
+            <h3 className="text-xl md:text-2xl font-semibold mb-4">
+              Unsolved Tasks Stack
+            </h3>
+          </center>
 
-      <div className="w-full">
-        <table className="w-full table-auto border-collapse">
-          <thead className="sticky top-0 bg-white">
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2 text-blue-600">ID</th>
-              <th className="border px-4 py-2 text-blue-600">Task Requester</th>
-              <th className="border px-4 py-2 text-blue-600">Task Type</th>
-              <th className="border px-4 py-2 text-blue-600">Prompt</th>
-              <th className="border px-4 py-2 text-blue-600">Fee</th>
-              <th className="border px-4 py-2 text-blue-600">Created At</th>
-              <th className="border px-4 py-2 text-blue-600">Unique ID</th>
-            </tr>
-          </thead>
-          <tbody>
+          <div className="w-full flex flex-wrap justify-center gap-4 mb-4">
             {unsolvedTasks.map((task: any) => (
-              <tr key={task.id}>
-                <td className="border px-4 py-2">{task.id}</td>
-                <td
-                  className={`border px-4 py-2 ${task.user === account?.address ? "bg-blue-100 font-semibold" : ""}`}
-                >
-                  {task.user.slice(0, 6)}...{task.user.slice(-4)}
-                  <button
-                    onClick={() => navigator.clipboard.writeText(task.user)}
-                    className="ml-2 text-blue-500 hover:underline"
-                  >
-                    Copy
-                    {task.user === account?.address && (
-                      <span className="ml-2 text-blue-600">(💡You)</span>
-                    )}
-                  </button>
-                </td>
-                <td className="border px-4 py-2">{task.task_type}</td>
-                <td className="border px-4 py-2">{task.prompt}</td>
-                <td className="border px-4 py-2">
-                  {task.fee} {task.fee_unit}
-                </td>
-                <td className="border px-4 py-2">
-                  {new Date(task.created_at).toLocaleDateString()}
-                </td>
-                <td className="border px-4 py-2">
-                  {shortenUuid(task.unique_id)}
-                  <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(task.unique_id)
-                    }
-                    className="ml-2 text-blue-500 hover:underline"
-                  >
-                    Copy
-                  </button>
-                </td>
-              </tr>
+              <div
+                key={task.unique_id}
+                className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4"
+              >
+                <PendingCard
+                  id={task?.id}
+                  user={task?.user}
+                  task_type={task?.task_type}
+                  prompt={task?.prompt}
+                  fee={task?.fee}
+                  fee_unit={task?.fee_unit}
+                  created_at={task?.created_at}
+                  unique_id={task?.unique_id}
+                />
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
+       
       </div>
 
       <div className="w-full flex justify-center">
@@ -613,93 +619,41 @@ export default function Home() {
       )}
 
       {/* TODO: copy the AI Agents part in basicContainer to here */}
-      <center><h3 className="text-3xl font-semibold mb-4">AI Agents</h3></center>
-      <div className="w-full">
-        <table className="w-full table-auto border-collapse">
-          <thead className="sticky top-0 bg-white">
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2 text-blue-600">Description</th>
-              <th className="border px-4 py-2 text-blue-600">Type</th>
-              <th className="border px-4 py-2 text-blue-600">Address</th>
-              <th className="border px-4 py-2 text-blue-600">Owner</th>
-              <th className="border px-4 py-2 text-blue-600">Homepage</th>
-              <th className="border px-4 py-2 text-blue-600">Give Task!</th>
-              <th className="border px-4 py-2 text-blue-600">Unique ID</th>
-            </tr>
-          </thead>
-          <tbody>
-            {agents.map((agent: any) => (
-              <tr key={agent.id}>
-                <td className="border px-4 py-2">{agent.description}</td>
-                <td className="border px-4 py-2">
-                  {agent.type.toUpperCase()}
-                </td>
-                <td className="border px-4 py-2">
-                  {agent.addr.slice(0, 6)}...{agent.addr.slice(-4)}
-                  <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(agent.addr)
-                    }
-                    className="ml-2 text-blue-500 hover:underline"
-                  >
-                    Copy
-                  </button>
-                  <button
-                    onClick={() => window.open(`https://did.rootmud.xyz?addr=${agent.addr}`, '_blank')}
-                    className="ml-2 text-blue-500 hover:underline"
-                  >
-                    View DID
-                  </button>
-                </td>
-                <td className="border px-4 py-2">
-                  {agent.owner_addr.slice(0, 6)}...
-                  {agent.owner_addr.slice(-4)}
-                  <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(agent.owner_addr)
-                    }
-                    className="ml-2 text-blue-500 hover:underline"
-                  >
-                    Copy
-                  </button>
-                </td>
-                <td className="border px-4 py-2">
-                  <a
-                    href={agent.chat_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline"
-                  >
-                    Chat with!
-                  </a>
-                </td>
-                <td className="border px-4 py-2">
-                  <button
-                    onClick={() => {
-                      setIsAssignTaskModalOpen(true);
-                      setTaskRequestApi(agent.task_request_api);
-                    }}
-                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                  >
-                    Assign Task
-                  </button>
-                </td>
-                <td className="border px-4 py-2">
-                  {shortenUuid(agent.unique_id)}
-                  <button
-                    onClick={() =>
-                      navigator.clipboard.writeText(agent.unique_id)
-                    }
-                    className="ml-2 text-blue-500 hover:underline"
-                  >
-                    Copy
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <center>
+        <h3 className="text-3xl font-semibold mt-16 mb-4">AI Agents</h3>
+      </center>
+
+      <div className="w-full flex flex-wrap justify-center gap-4 mb-4">
+        {agents.map((agent: any) => (
+          <div
+            key={agent.unique_id}
+            className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4"
+          >
+            <AIAgentCard
+              description={agent.description}
+              type={agent.type}
+              addr={agent.addr}
+              owner_addr={agent.owner_addr}
+              unique_id={agent.unique_id}
+              chat_url={agent.chat_url}
+              assignTaskDom={
+                <Button
+                  style={{marginTop: "10px"}}
+                  size="small"
+                  variant="outlined"
+                  onClick={() => {
+                    setIsAssignTaskModalOpen(true);
+                    setTaskRequestApi(agent.task_request_api);
+                  }}
+                >
+                  Assign Task
+                </Button>
+              }
+            />
+          </div>
+        ))}
       </div>
+     
       <div className="w-full flex justify-center">
         <button
           onClick={() => setIsAgentModalOpen(true)}
@@ -712,7 +666,7 @@ export default function Home() {
       {isAssignTaskModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-[500px]">
-            <h3 className="text-2xl font-semibold mb-4">
+            <h3 className="text-2xl font-semibold mb-4 text-black dark:text-white">
               Assign Task to This Agent
             </h3>
             <div>
@@ -723,9 +677,7 @@ export default function Home() {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-blue-500"
                 rows={1}
                 value={taskId}
-                onChange={(e) =>
-                  setTaskId(e.target.value)
-                }
+                onChange={(e) => setTaskId(e.target.value)}
               />
             </div>
 
@@ -754,14 +706,14 @@ export default function Home() {
             <h3 className="text-2xl font-semibold mb-4">
               How to Register Your AI Agent
             </h3>
-            
+
             <div className="space-y-4">
               <div className="p-4 bg-gray-50 rounded-md">
                 <p className="font-medium mb-2">Step 1:</p>
                 <p className="flex items-center">
                   Git Clone The Template From:
-                  <a 
-                    href="https://github.com/NonceGeek/tai-shang-micro-ai-saas/tree/main/agents" 
+                  <a
+                    href="https://github.com/NonceGeek/tai-shang-micro-ai-saas/tree/main/agents"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="ml-2 text-blue-600 hover:underline"
@@ -783,7 +735,17 @@ export default function Home() {
 
               <div className="p-4 bg-gray-50 rounded-md">
                 <p className="font-medium mb-2">Step4:</p>
-                <p>Give Agent a MoveDID: <a href="https://did.rootmud.xyz" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">DID Manager</a></p>
+                <p>
+                  Give Agent a MoveDID:{" "}
+                  <a
+                    href="https://did.rootmud.xyz"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:underline"
+                  >
+                    DID Manager
+                  </a>
+                </p>
               </div>
             </div>
 
