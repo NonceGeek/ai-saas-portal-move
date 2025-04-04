@@ -723,7 +723,7 @@ export default function Home() {
                 <p>
                   Give Agent a MoveDID:{" "}
                   <a
-                    href={DID_ROOTMUD_URL || "https://did.rootmud.xyz"}
+                    href={DID_ROOTMUD_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline"

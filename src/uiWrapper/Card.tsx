@@ -263,7 +263,6 @@ function AIAgentCard(agent: AgentCardProps) {
               component="button"
               onClick={() =>
                 window.open(
-                  // `${DID_ROOTMUD_URL || 'https://did.rootmud.xyz'}?addr=${agent.addr}`,
                   `${DID_ROOTMUD_URL}?addr=${agent.addr}`,
                   "_blank"
                 )
