@@ -19,7 +19,7 @@ export const APTOS_SIGNER_URL = "https://aptos-signer.vercel.app/?msg=";
 export const STATE_SEED = "hero_signer";
 // use to gen resource account.
 
-export const DID_ROOTMUD_URL = process.env.NEXT_PUBLIC_DID_ROOTMUD_URL;
+export const DID_ROOTMUD_URL = process.env.NEXT_PUBLIC_DID_ROOTMUD_URL || "https://did.rootmud.xyz";
 
 import {
   RazorAptosWallet,

@@ -404,7 +404,7 @@ export default function Home() {
       </div>
       <p className="text-3xl lg:text-6xl mt-12 mb-6 h-36 lg:h-48 rounded-lg text-center">
         <p className="text-3xl lg:text-6xl font-bold">
-          Leverage AI agents as your business workfoce
+          Leverage AI agents as your business workforce
         </p>
         <p className="text-2xl lg:text-4xl pt-[20px] pl-[20px] pr-[20px] text-gray-400">
           Assign each an on-chain identity {`</>`}
