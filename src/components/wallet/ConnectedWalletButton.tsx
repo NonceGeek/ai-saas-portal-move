@@ -37,6 +37,7 @@ export function ConnectedWalletButton() {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
